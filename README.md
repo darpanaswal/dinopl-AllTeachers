@@ -184,10 +184,8 @@ addons:
                         Save layerwise parameter and gradient statistics for teacher and/or student.
 ```
 
-Here is the text block you should append to the **Usage** section of your `README.md`.
-
-```
 ### Experiment: Impact of Teacher Initialization
+```
 As part of the critical analysis, we investigate whether the success of "Random Teachers" is specific to the Kaiming (He) initialization used in the paper, or if other initialization schemes also produce "good" teachers.
 
 We use `configs/cifar10_teacher_init_experiments.json` to ensure the exact baseline settings from the paper (no teacher updates, no weight decay, ResNet18) are preserved, while varying the initialization statistics.
