@@ -139,6 +139,20 @@ def main(config:Configuration):
     student, teacher = init_student_teacher(config=config, model=model)
     del model # don't need this anymore
 
+    if config.t_init_method != 'default':
+        print(f'=> Overwriting Teacher Encoder initialization with: {config.t_init_method}')
+        # We only re-init the encoder (enc), keeping the head structure as is (or re-init if you prefer, but usually enc is key)
+        for m in teacher.enc.modules():
+            if isinstance(m, (torch.nn.Conv2d, torch.nn.Linear)):
+                if config.t_init_method == 'xavier':
+                    torch.nn.init.xavier_uniform_(m.weight)
+                elif config.t_init_method == 'orthogonal':
+                    torch.nn.init.orthogonal_(m.weight)
+                elif config.t_init_method == 'gaussian':
+                    torch.nn.init.normal_(m.weight, mean=0.0, std=0.01)
+                
+                if m.bias is not None:
+                    torch.nn.init.constant_(m.bias, 0)
 
     # DINO Setup
     dino = DINO(mc_spec=config.mc_spec, student=student, teacher=teacher,
