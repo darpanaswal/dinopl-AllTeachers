@@ -184,7 +184,7 @@ addons:
                         Save layerwise parameter and gradient statistics for teacher and/or student.
 ```
 
-## We conduct 2 additional experiments, and pose this additional Research Question.
+# We conduct 2 additional experiments, and pose this additional Research Question.
 
 ## RQ. Is the efficacy of Random Teacher distillation driven by the topological complexity of deep non-linear manifolds, or is it sufficiently explained by well-conditioned, distance-preserving random projections?
 
