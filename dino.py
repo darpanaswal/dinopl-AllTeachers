@@ -28,6 +28,25 @@ from dinopl.tracking import (AccuracyTracker, FeatureHistTracker, FeatureSaver,
                              PerCropEntropyTracker)
 
 
+class IdentityDINOHead(torch.nn.Module):
+    def __init__(self, in_dim, temp=1.0, cmom=0.9):
+        super().__init__()
+        self.out_dim = in_dim
+        # Mock DINOHead attributes to satisfy schedulers/hooks
+        self.temp = temp 
+        self.cmom = cmom
+        self.last_layer = torch.nn.Identity() # For gradient cancellation hooks
+        self.register_buffer('cent', torch.zeros(in_dim)) # Dummy center
+
+    def forward(self, x, update_cent=False):
+        # Return dictionary structure expected by DINOModel
+        # For Identity, logits = projections = embeddings
+        return {'logits': x, 'projections': x}
+        
+    def reset_parameters(self, generator=None):
+        pass # Nothing to reset
+
+
 def main(config:Configuration):
     devices = None if config.force_cpu else [U.pick_single_gpu()]
 
@@ -122,14 +141,13 @@ def main(config:Configuration):
     enc = get_encoder(config)()
     config.embed_dim = enc.embed_dim
     # === Identity Head Logic ===
-    if config.out_dim == -1:
+    if config.out_dim == -1: 
         print("=> Using IDENTITY Head (Raw Features)")
-        # Create a dummy identity head
-        head = torch.nn.Identity()
-        # Ensure downstream metrics use the correct dimension (embedding dimension)
+        # Use the wrapper class instead of raw nn.Identity()
+        head = IdentityDINOHead(config.embed_dim)
         config.out_dim = config.embed_dim 
     else:
-        # Standard DINO Head Creation (Deep or Linear)
+        # Standard Head Creation
         config.out_dim = config.out_dim if config.out_dim > 0 else config.embed_dim
         config.hid_dims = [hid_dim if hid_dim > 0 else config.embed_dim for hid_dim in config.hid_dims]
         config.l2bot_dim = config.l2bot_dim if config.l2bot_dim > 0 else config.embed_dim
@@ -137,9 +155,9 @@ def main(config:Configuration):
         head = DINOHead(config.embed_dim, config.out_dim, 
                 hidden_dims=config.hid_dims, 
                 l2bot_dim=config.l2bot_dim, 
-                l2bot_cfg=config.l2bot_cfg, 
-                use_bn=config.mlp_bn, 
-                act_fn=config.mlp_act, 
+                l2bot_cfg=config.l2bot_cfg,
+                use_bn=config.mlp_bn,
+                act_fn=config.mlp_act,
                 init_method=config.head_init_method)
     # === HEAD LOGIC ENDS ===
     model = DINOModel(enc, head)
