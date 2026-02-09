@@ -175,7 +175,9 @@ class Configuration(object):
         # Teacher Update, Temperature, Centering
         dino = parser.add_argument_group('DINO')
         ## new init methods
-        dino.add_argument('--t_init_method', type=str, choices={'default', 'xavier', 'orthogonal'}, default='default',
+        dino.add_argument('--t_init_method', type=str, 
+                          choices={'default', 'xavier', 'orthogonal', 'gaussian'}, 
+                          default='default',
                           help='Initialization distribution for the teacher encoder.')
         dino.add_argument('--t_init', type=str, choices={'random', 's_ckpt', 't_ckpt'}, default='random',
                             help='Initialization of teacher, specify \'--ckpt_path\'.')
