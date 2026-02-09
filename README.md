@@ -184,8 +184,9 @@ addons:
                         Save layerwise parameter and gradient statistics for teacher and/or student.
 ```
 
-We conduct 2 additional experiments, and pose this additional Research Question.
-RQ. Is the efficacy of Random Teacher distillation driven by the topological complexity of deep non-linear manifolds, or is it sufficiently explained by well-conditioned, distance-preserving random projections?
+## We conduct 2 additional experiments, and pose this additional Research Question.
+
+## RQ. Is the efficacy of Random Teacher distillation driven by the topological complexity of deep non-linear manifolds, or is it sufficiently explained by well-conditioned, distance-preserving random projections?
 
 ### Additional Experiment A: Impact of Teacher Initialization
 As part of the critical analysis, we investigate whether the success of "Random Teachers" is specific to the Kaiming (He) initialization used in the paper, or if other initialization schemes also produce "good" teachers.
