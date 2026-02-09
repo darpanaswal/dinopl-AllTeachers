@@ -184,7 +184,10 @@ addons:
                         Save layerwise parameter and gradient statistics for teacher and/or student.
 ```
 
-### Experiment: Impact of Teacher Initialization
+We conduct 2 additional experiments, and pose this additional Research Question.
+RQ. Is the efficacy of Random Teacher distillation driven by the topological complexity of deep non-linear manifolds, or is it sufficiently explained by well-conditioned, distance-preserving random projections?
+
+### Additional Experiment A: Impact of Teacher Initialization
 As part of the critical analysis, we investigate whether the success of "Random Teachers" is specific to the Kaiming (He) initialization used in the paper, or if other initialization schemes also produce "good" teachers.
 
 We use `configs/cifar10_teacher_init_experiments.json` to ensure the exact baseline settings from the paper (no teacher updates, no weight decay, ResNet18) are preserved, while varying the initialization statistics.
@@ -218,6 +221,34 @@ Tests a naive standard normal distribution . Expected to fail due to vanishing s
 
 ```bash
 python dino.py --from_json configs/cifar10_teacher_init_experiments.json --t_init_method gaussian
+
+```
+
+### Additional Experiment B: Linearity vs. Depth (The Johnson-Lindenstrauss Test)
+
+This critical analysis investigates whether the performance of Random Teachers stems from the deep non-linear "folding" of the data manifold (via the MLP head) or simply from high-dimensional random projections (Johnson-Lindenstrauss lemma). We compare the deep non-linear baseline against a linear projection and a raw identity mapping.
+
+**1. Baseline (Deep Non-linear Head)**
+The standard Random Teacher setup with a 2-layer MLP (ReLU activations).
+
+```bash
+python dino.py --from_json configs/cifar10_teacher_init_experiments.json
+
+```
+
+**2. Variant A: Linear Head**
+Removes the hidden layers and non-linearities, testing if a simple random matrix multiplication is sufficient.
+
+```bash
+python dino.py --from_json configs/cifar10_linear_head.json
+
+```
+
+**3. Variant B: Identity Head (No Head)**
+Passes raw backbone features directly to the loss, testing if projection is necessary at all.
+
+```bash
+python dino.py --from_json configs/cifar10_identity_head.json
 
 ```
 
